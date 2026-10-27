@@ -1,0 +1,67 @@
+// Prisma 7: connection URLs live in prisma.config.ts (CLI) and lib/prisma.ts (runtime adapter).
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  // Supabase installs extensions into the "extensions" schema, which is on the default search_path.
+  extensions = [postgis(schema: "extensions")]
+}
+
+/// One row per roof calculation, kept as a log / cache of results.
+model SolarCalculation {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt         DateTime @default(now())
+  osmId             String?
+  targetMonthlyKwh  Float
+  roofAreaM2        Float
+  maxPanels         Int
+  recommendedPanels Int
+  systemCapacityKw  Float
+  estMonthlyKwh     Float
+  monthlyKwh        Json // number[12], kWh per calendar month
+  tiltDeg           Float
+  azimuthDeg        Float
+
+  // Prisma cannot read/write these directly; use $queryRaw / $executeRaw with PostGIS functions.
+  footprint Unsupported("geometry(Polygon, 4326)")
+  panels    Unsupported("geometry(MultiPolygon, 4326)")?
+
+  @@index([footprint], type: Gist)
+  @@index([createdAt])
+}
+
+/// Cached OpenStreetMap building outlines per 0.005° tile (see lib/tiles.ts), so areas
+/// already viewed keep working when the public Overpass servers are overloaded.
+model BuildingTile {
+  key       String   @id // "<ix>_<iy>" = floor(lon / 0.005) _ floor(lat / 0.005)
+  fetchedAt DateTime @default(now())
+  count     Int
+  features  Json // GeoJSON Feature[] (closed ways tagged building=*)
+}
+
+/// A solar plan a signed-in user chose to save. The numbers are recomputed on the server at save
+/// time; `result` keeps the full API response so the plan can be reopened on the map.
+model SolarPlan {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String   @db.Uuid // Supabase Auth user (auth.users.id)
+  name              String
+  createdAt         DateTime @default(now())
+  osmId             String?
+  targetMonthlyKwh  Float
+  recommendedPanels Int
+  maxPanels         Int
+  systemCapacityKw  Float
+  estMonthlyKwh     Float
+  coveragePct       Float
+  roofAreaM2        Float
+  result            Json // CalculateSolarResponse
+
+  footprint Unsupported("geometry(Polygon, 4326)")
+
+  @@index([userId, createdAt])
+}

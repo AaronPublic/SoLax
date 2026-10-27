@@ -1,0 +1,20 @@
+.button {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--warn);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--warn);
+  background: var(--warn-bg);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
