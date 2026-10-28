@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import SolarMap, { type DrawRequest, type MapFocus, type RoofSelection } from "@/components/SolarMap";
@@ -14,6 +14,10 @@ import type { CalculateSolarRequest, CalculateSolarResponse, SavedPlanResponse }
 import styles from "./SolarPlanner.module.css";
 
 const PRESETS = [300, 450, 800, 1200];
+/** Same cap as the API's request schema (lib/calculate.ts). */
+const MAX_KWH = 100_000;
+const KWH_INPUT_ID = "kwh";
+const RESULTS_ID = "plan-results";
 /** Wait for typing to pause before calculating, so "450" doesn't also run for "4" and "45". */
 const KWH_TYPING_PAUSE_MS = 700;
 /** Roof + usage kept across the login redirect so a guest can save after signing in. */
@@ -44,7 +48,14 @@ export default function SolarPlanner() {
   const requestRef = useRef<AbortController | null>(null);
 
   const monthlyKwh = Number(kwhInput);
-  const kwhValid = kwhInput.trim() !== "" && Number.isFinite(monthlyKwh) && monthlyKwh > 0;
+  const kwhEntered = kwhInput.trim() !== "";
+  const kwhValid = kwhEntered && Number.isFinite(monthlyKwh) && monthlyKwh > 0 && monthlyKwh <= MAX_KWH;
+  const kwhError =
+    kwhEntered && !kwhValid
+      ? monthlyKwh > MAX_KWH
+        ? `Enter at most ${MAX_KWH.toLocaleString()} kWh.`
+        : "Enter a number above 0."
+      : null;
   const savedName = saved && kwhValid && saved.kwh === monthlyKwh ? saved.name : null;
 
   // The API returns every panel slot plus a 1 kWp yield profile, so re-sizing for a new
@@ -196,8 +207,49 @@ export default function SolarPlanner() {
   const steps = [
     { label: "Usage", done: kwhValid },
     { label: "Roof", done: roof !== null },
-    { label: "Review", done: savedName !== null },
+    { label: "Save", done: savedName !== null },
   ];
+
+  const retry = roof && kwhValid ? () => void calculate(roof, monthlyKwh) : undefined;
+
+  // Small screens put the sidebar below the map, so the map carries a one-line summary and a
+  // shortcut to the part of the sidebar that needs attention.
+  let mapSummary: ReactNode = null;
+  if (!draw) {
+    if (loading) {
+      mapSummary = (
+        <MapCard>
+          <span className={styles.mapSpinner} aria-hidden="true" />
+          Calculating…
+        </MapCard>
+      );
+    } else if (error) {
+      mapSummary = (
+        <MapCard action="See why" onAction={() => reveal(RESULTS_ID)} tone="warn">
+          Something went wrong.
+        </MapCard>
+      );
+    } else if (!kwhValid) {
+      mapSummary = (
+        <MapCard action="Enter usage" onAction={() => reveal(KWH_INPUT_ID, true)}>
+          {roof ? "Roof selected. Now enter your monthly usage." : "Start with your monthly usage, then tap your roof."}
+        </MapCard>
+      );
+    } else if (!roof) {
+      mapSummary = <MapCard>Tap your roof when it&apos;s outlined.</MapCard>;
+    } else if (fit?.maxPanels === 0) {
+      mapSummary = <MapCard tone="warn">No full-size panel fits on this roof.</MapCard>;
+    } else if (fit && sizing) {
+      mapSummary = (
+        <MapCard action="Details" onAction={() => reveal(RESULTS_ID)}>
+          <span>
+            <strong>{sizing.recommendedPanels} panels</strong> · {sizing.systemCapacityKw.toFixed(2)} kWp ·{" "}
+            ≈{Math.round(sizing.estMonthlyKwh).toLocaleString()} kWh/mo
+          </span>
+        </MapCard>
+      );
+    }
+  }
 
   return (
     <div className={styles.layout}>
@@ -218,23 +270,35 @@ export default function SolarPlanner() {
         <ol className={styles.steps} aria-label="Progress">
           {steps.map((s, i) => (
             <li key={s.label} className={styles.step} aria-current={!s.done && steps.slice(0, i).every((p) => p.done) ? "step" : undefined}>
-              <span className={s.done ? styles.stepDone : styles.stepTodo}>{s.done ? "✓" : i + 1}</span>
+              <span className={s.done ? styles.stepDone : styles.stepTodo}>
+                {s.done ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="done">
+                    <path d="M5 12l5 5L20 7" />
+                  </svg>
+                ) : (
+                  i + 1
+                )}
+              </span>
               {s.label}
             </li>
           ))}
         </ol>
 
         <section className={styles.field}>
-          <label htmlFor="kwh" className={styles.label}>
+          <label htmlFor={KWH_INPUT_ID} className={styles.label}>
             Monthly consumption
           </label>
-          <div className={styles.inputBox}>
+          {/* Highlighted while a picked roof is waiting for a usage figure. */}
+          <div className={roof && !kwhValid && !draw ? `${styles.inputBox} ${styles.inputBoxAttention}` : styles.inputBox}>
             <input
-              id="kwh"
+              id={KWH_INPUT_ID}
               type="number"
               inputMode="decimal"
               min={1}
+              max={MAX_KWH}
               step={10}
+              aria-invalid={kwhError ? true : undefined}
+              aria-describedby="kwh-hint"
               placeholder="e.g. 450"
               value={kwhInput}
               onChange={(e) => setKwhInput(e.target.value)}
@@ -257,7 +321,9 @@ export default function SolarPlanner() {
               );
             })}
           </div>
-          <p className={styles.hint}>Find it on your electric bill under “Total kWh used”.</p>
+          <p id="kwh-hint" className={kwhError ? `${styles.hint} ${styles.hintError}` : styles.hint}>
+            {kwhError ?? "Find it on your electric bill under “Total kWh used”."}
+          </p>
         </section>
 
         {draw ? (
@@ -313,21 +379,30 @@ export default function SolarPlanner() {
           )
         )}
 
-        <ResultsPanel fit={fit} sizing={sizing} targetKwh={kwhValid ? monthlyKwh : null} loading={loading} error={error} />
-
-        {fit && sizing && roof && fit.maxPanels > 0 && (
-          <SavePlan
-            user={user}
-            roof={roof}
-            monthlyKwh={monthlyKwh}
-            savedName={savedName}
-            defaultName={saved?.name}
-            onSaved={(name) => setSaved({ name, kwh: monthlyKwh })}
-            loginHref={authHref("/login")}
-            registerHref={authHref("/register")}
-            onBeforeAuth={rememberForLogin}
+        <div id={RESULTS_ID} className={styles.results}>
+          <ResultsPanel
+            fit={fit}
+            sizing={sizing}
+            targetKwh={kwhValid ? monthlyKwh : null}
+            loading={loading}
+            error={error}
+            onRetry={retry}
           />
-        )}
+
+          {fit && sizing && roof && fit.maxPanels > 0 && (
+            <SavePlan
+              user={user}
+              roof={roof}
+              monthlyKwh={monthlyKwh}
+              savedName={savedName}
+              defaultName={saved?.name}
+              onSaved={(name) => setSaved({ name, kwh: monthlyKwh })}
+              loginHref={authHref("/login")}
+              registerHref={authHref("/register")}
+              onBeforeAuth={rememberForLogin}
+            />
+          )}
+        </div>
 
         <p className={styles.fineprint}>
           Estimates from NREL PVWatts v8 with 14% system losses, 15° tilt facing south. Roof outlines come from
@@ -345,8 +420,41 @@ export default function SolarPlanner() {
           draw={draw}
           onDrawDone={finishDrawing}
           onDrawCancel={() => setDraw(null)}
+          overlay={mapSummary}
         />
       </main>
     </div>
   );
+}
+
+function MapCard({
+  children,
+  action,
+  onAction,
+  tone,
+}: {
+  children: ReactNode;
+  action?: string;
+  onAction?: () => void;
+  tone?: "warn";
+}) {
+  return (
+    <div className={tone === "warn" ? `${styles.mapCard} ${styles.mapCardWarn}` : styles.mapCard} role="status">
+      <div className={styles.mapCardText}>{children}</div>
+      {action && onAction && (
+        <button type="button" className={styles.mapCardAction} onClick={onAction}>
+          {action}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Scrolls the sidebar section into view (below the map on small screens), optionally focusing it. */
+function reveal(id: string, focus = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: focus ? "center" : "start" });
+  if (focus) el.focus({ preventScroll: true });
 }

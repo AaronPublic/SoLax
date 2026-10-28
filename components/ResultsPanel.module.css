@@ -1,26 +1,58 @@
 .results {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
+  animation: rise var(--dur) var(--ease-out);
 }
 
 .error,
 .warning {
   margin: 0;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
   background: var(--warn-bg);
   color: var(--warn-ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  animation: rise var(--dur) var(--ease-out);
+}
+
+.error p {
+  margin: 0;
+  flex: 1 1 180px;
+}
+
+.retry {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid currentColor;
+  background: transparent;
   font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retry:hover {
+  background: rgba(153, 27, 27, 0.06);
 }
 
 .notice {
   margin: 0;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--ground);
-  color: var(--muted);
-  font-size: 13px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunk);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .loading {
@@ -29,15 +61,16 @@
   align-items: center;
   gap: 10px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .spinner {
+  flex-shrink: 0;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid var(--line-strong);
-  border-top-color: var(--ink);
+  border: 2px solid var(--accent-line);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -47,31 +80,34 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation: none;
-  }
-}
-
 /* Stat cards */
 .stats {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .stat {
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--ground);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+}
+
+/* Hairline grid between the four cells. */
+.stat:nth-child(odd) {
+  border-right: 1px solid var(--line);
+}
+
+.stat:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--line);
 }
 
 .stat dt {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -80,15 +116,23 @@
 }
 
 .statValue {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
+/* The lead figure: how many panels. */
+.stat:first-child .statValue {
+  color: var(--primary);
+}
+
 .statUnit {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
 }
 
 .statSub {
@@ -108,18 +152,19 @@
 .chart {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .chartHead {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 12px;
 }
 
 .heading {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -143,7 +188,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .bars li {
@@ -160,8 +205,8 @@
 
 .track {
   position: relative;
-  height: 12px;
-  border-radius: 3px;
+  height: 10px;
+  border-radius: 2px;
   background: var(--track);
 }
 
@@ -175,12 +220,22 @@
   background: var(--ink);
 }
 
+/* Full width, scaled to the month's share; grows in month by month on first show. */
 .bar {
   position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: 3px;
-  background: var(--panel);
-  transition: width 0.25s ease;
+  inset: 0;
+  border-radius: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-out);
+  animation: grow 500ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 .value {
@@ -193,9 +248,11 @@
 /* Details */
 .details {
   margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 6px 14px;
+  gap: 8px 16px;
   font-size: 13px;
 }
 
@@ -205,4 +262,5 @@
 
 .details dd {
   margin: 0;
+  font-variant-numeric: tabular-nums;
 }

@@ -15,16 +15,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
+  min-height: 36px;
+  max-width: calc(100% - 100px);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
   background: var(--scrim);
-  color: #fff;
+  color: var(--on-dark);
   font-size: 13px;
+  line-height: 1.35;
   pointer-events: none;
 }
 
 .dot {
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -35,7 +38,7 @@
 }
 
 .dotBusy {
-  background: var(--sun);
+  background: var(--accent-bright);
 }
 
 .dotIdle {
@@ -46,20 +49,26 @@
   background: #f87171;
 }
 
-.zoom {
+.controls {
   position: absolute;
   right: 20px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  gap: 10px;
 }
 
-.zoom button {
+.group {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.group button {
   width: 44px;
   height: 44px;
   border: 0;
@@ -71,26 +80,45 @@
   cursor: pointer;
 }
 
-.zoom button + button {
+.group button + button {
   border-top: 1px solid var(--line);
 }
 
-.zoom button:hover {
+.group button:hover:not(:disabled) {
   background: var(--ground);
 }
 
-.legend {
+.group button:disabled {
+  color: var(--muted);
+  cursor: progress;
+}
+
+/* Summary card (if any) stacked above the legend. */
+.bottom {
   position: absolute;
   left: 20px;
   bottom: 28px;
   max-width: calc(100% - 40px);
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Small screens only: on wide ones the sidebar beside the map already shows the same thing. */
+.overlay {
+  display: none;
+  width: 100%;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--scrim);
-  color: #fff;
+  color: var(--on-dark);
   font-size: 12px;
 }
 
@@ -115,14 +143,14 @@
 
 .swatchHover {
   height: 10px;
-  background: rgba(245, 183, 0, 0.6);
-  outline: 1.5px solid var(--sun);
+  background: rgba(249, 115, 22, 0.55);
+  outline: 1.5px solid var(--accent-bright);
 }
 
 .swatchPanel {
   height: 7px;
-  background: var(--panel);
-  outline: 1px solid #fff;
+  background: var(--on-dark);
+  outline: 1px solid var(--accent-bright);
 }
 
 .swatchSlot {
@@ -131,12 +159,12 @@
 }
 
 .attribution {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--on-dark-muted);
   font-size: 11px;
 }
 
 .attribution a {
-  color: #fff;
+  color: var(--on-dark);
 }
 
 .overlayError {
@@ -151,19 +179,33 @@
   line-height: 1.5;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 919px) {
   .status {
     top: 12px;
     right: 12px;
   }
 
-  .zoom {
+  .status {
+    max-width: calc(100% - 24px);
+  }
+
+  .controls {
     right: 12px;
   }
 
-  .legend {
+  .bottom {
     left: 12px;
+    right: 12px;
     bottom: 24px;
-    max-width: calc(100% - 24px);
+    max-width: none;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  /* The summary card replaces the colour key; attribution stays. */
+  .bottom:has(.overlay) .legendItems {
+    display: none;
   }
 }

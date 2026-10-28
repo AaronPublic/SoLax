@@ -12,10 +12,23 @@ interface Props {
   targetKwh: number | null;
   loading: boolean;
   error: string | null;
+  /** Runs the failed calculation again; omitted when there's nothing to retry. */
+  onRetry?: () => void;
 }
 
-export default function ResultsPanel({ fit, sizing, targetKwh, loading, error }: Props) {
-  if (error) return <p className={styles.error}>{error}</p>;
+export default function ResultsPanel({ fit, sizing, targetKwh, loading, error, onRetry }: Props) {
+  if (error) {
+    return (
+      <div className={styles.error} role="alert">
+        <p>{error}</p>
+        {onRetry && (
+          <button type="button" className={styles.retry} onClick={onRetry}>
+            Try again
+          </button>
+        )}
+      </div>
+    );
+  }
   if (loading) {
     return (
       <p className={styles.loading} role="status">
@@ -63,10 +76,10 @@ export default function ResultsPanel({ fit, sizing, targetKwh, loading, error }:
         </div>
         <ul className={styles.bars} aria-label="Estimated production by month">
           {sizing.monthlyKwh.map((kwh, i) => (
-            <li key={MONTHS[i]}>
+            <li key={MONTHS[i]} style={{ "--i": i } as CSSProperties}>
               <span className={styles.month}>{MONTHS[i]}</span>
               <span className={styles.track} style={{ "--target": targetLeft } as CSSProperties}>
-                <span className={styles.bar} style={{ width: `${(kwh / peak) * 100}%` }} />
+                <span className={styles.bar} style={{ transform: `scaleX(${kwh / peak})` }} />
               </span>
               <span className={styles.value}>{fmt(kwh)}</span>
             </li>

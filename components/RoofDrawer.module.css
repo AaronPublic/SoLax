@@ -4,10 +4,10 @@
   left: 20px;
   width: min(420px, calc(100% - 100px));
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-float);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -29,7 +29,7 @@
 .error {
   margin: 0;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--warn-bg);
   color: var(--warn-ink);
   font-size: 13px;
@@ -46,7 +46,7 @@
 .ghost {
   min-height: 40px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -54,12 +54,12 @@
 
 .primary {
   border: 0;
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .primary:hover:not(:disabled) {
-  background: #2a313c;
+  background: var(--primary-hover);
 }
 
 .secondary {
@@ -88,7 +88,7 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 919px) {
   .toolbar {
     top: 12px;
     left: 12px;

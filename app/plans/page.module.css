@@ -15,9 +15,9 @@
 
 .title {
   margin: 0;
-  font-size: 32px;
+  font-size: clamp(30px, 3.4vw, 40px);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .newPlan {
@@ -25,15 +25,15 @@
   align-items: center;
   min-height: 44px;
   padding: 0 18px;
-  border-radius: 10px;
-  background: var(--ink);
-  color: var(--surface);
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--on-primary);
   font-weight: 600;
   text-decoration: none;
 }
 
 .newPlan:hover {
-  background: #2a313c;
+  background: var(--primary-hover);
 }
 
 .muted {
@@ -42,8 +42,8 @@
 
 .empty {
   padding: 48px 24px;
-  border-radius: 16px;
-  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--line-strong);
   background: var(--surface);
   text-align: center;
   display: flex;
@@ -73,9 +73,11 @@
 
 .card {
   padding: 20px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -110,8 +112,8 @@
 
 .stats > div {
   padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--ground);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
 }
 
 .stats dt {
@@ -121,8 +123,9 @@
 
 .stats dd {
   margin: 2px 0 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -158,15 +161,22 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  border-radius: 10px;
-  background: var(--ink);
-  color: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
   font-weight: 600;
   text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 
 .open:hover {
-  background: #2a313c;
+  border-color: var(--accent);
+  color: var(--primary);
+}
+
+.card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-2);
 }
 
 @media (max-width: 600px) {

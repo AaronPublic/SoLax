@@ -1,21 +1,63 @@
+/*
+ * Design tokens: white surfaces, warm-neutral text, one orange.
+ * Components use these names only, never raw colours.
+ */
 :root {
-  --ground: #f4f5f2;
+  /* Surfaces */
+  --ground: #ffffff;
   --surface: #ffffff;
-  --ink: #14181f;
-  --muted: #5b6470;
-  --line: #e2e5df;
-  --line-strong: #c9cdc5;
-  --track: #eceee9;
-  --panel: #1d4ed8;
-  --sun: #f5b700;
-  --sun-soft: #fff8e1;
-  --sun-line: #f1d98a;
-  --ok: #0f7a3d;
-  --warn: #b4400b;
-  --warn-bg: #fdece4;
-  --warn-ink: #8a2d0a;
-  --map: #3a4537;
-  --scrim: rgba(20, 24, 31, 0.88);
+  --surface-sunk: #fafaf9;
+  --line: #e7e5e4;
+  --line-strong: #d6d3d1;
+  --track: #f5f5f4;
+  --map: #2f312e;
+
+  /* Text */
+  --ink: #1c1917;
+  --ink-hover: #292524;
+  --text: #44403c;
+  --muted: #57534e;
+  --on-dark: #ffffff;
+  --on-dark-muted: rgba(255, 255, 255, 0.8);
+
+  /* Orange. --primary carries white text (5.2:1); --accent is for marks and fills only. */
+  --primary: #c2410c;
+  --primary-hover: #9a3412;
+  --on-primary: #ffffff;
+  --accent: #ea580c;
+  --accent-bright: #f97316;
+  --accent-soft: #fff7ed;
+  --accent-line: #fed7aa;
+  --link: #c2410c;
+  --link-hover: #9a3412;
+  --focus: #ea580c;
+
+  /* Status */
+  --ok: #15803d;
+  --ok-bg: #f0fdf4;
+  --warn: #b91c1c;
+  --warn-bg: #fef2f2;
+  --warn-ink: #991b1b;
+
+  /* Overlays */
+  --scrim: rgba(28, 25, 23, 0.86);
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* Elevation: used sparingly, mostly for things floating on the map. */
+  --shadow-1: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --shadow-2: 0 4px 12px rgba(28, 25, 23, 0.08);
+  --shadow-float: 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 220ms;
 }
 
 * {
@@ -35,17 +77,51 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
 button,
 input {
   font: inherit;
   color: inherit;
 }
 
+button,
 a {
-  color: var(--panel);
+  touch-action: manipulation;
+}
+
+a {
+  color: var(--link);
+}
+
+::selection {
+  background: var(--accent-line);
+  color: var(--ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--panel);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+/* Shared entrance: content that appears after an action fades up a few pixels. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

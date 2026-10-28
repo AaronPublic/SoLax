@@ -6,7 +6,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 48px;
+  gap: 56px;
 }
 
 .heroText {
@@ -18,17 +18,15 @@
 
 .eyebrow {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
+  color: var(--primary);
 }
 
 .headline {
   margin: 0;
-  font-size: clamp(36px, 5vw, 58px);
-  line-height: 1.04;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.05;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
@@ -37,8 +35,8 @@
   margin: 0;
   max-width: 34em;
   font-size: 18px;
-  line-height: 1.55;
-  color: #3a414b;
+  line-height: 1.6;
+  color: var(--text);
 }
 
 .ctas {
@@ -53,30 +51,42 @@
 .ctaPrimaryInverse {
   display: inline-flex;
   align-items: center;
-  min-height: 52px;
-  padding: 0 24px;
-  border-radius: 12px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 
-.ctaPrimary {
-  background: var(--ink);
-  color: var(--surface);
+.ctaPrimary,
+.ctaPrimaryInverse {
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
-.ctaPrimary:hover {
-  background: #2a313c;
+.ctaPrimary:hover,
+.ctaPrimaryInverse:hover {
+  background: var(--primary-hover);
+}
+
+.ctaPrimary:active,
+.ctaPrimaryInverse:active,
+.ctaSecondary:active {
+  transform: scale(0.98);
 }
 
 .ctaSecondary {
-  border: 1.5px solid var(--ink);
+  border: 1px solid var(--line-strong);
   color: var(--ink);
 }
 
 .ctaSecondary:hover {
-  background: rgba(20, 24, 31, 0.05);
+  border-color: var(--ink);
 }
 
 .note {
@@ -85,16 +95,21 @@
   color: var(--muted);
 }
 
-/* Hero visual: a stylised satellite tile */
+/* Hero visual: a stylised satellite tile. Illustration-only colours live here. */
 .visual {
+  --street: #646860;
+  --house-a: #8d8a82;
+  --house-b: #7c7a74;
+  --house-c: #948f84;
+  --roof: #a39d90;
+
   flex: 1 1 420px;
   position: relative;
   margin: 0;
   min-height: 420px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--map);
-  box-shadow: 0 24px 60px rgba(20, 24, 31, 0.25);
 }
 
 .street {
@@ -103,7 +118,7 @@
   right: -20%;
   top: 74%;
   height: 34px;
-  background: #6a6c66;
+  background: var(--street);
   transform: rotate(-12deg);
 }
 
@@ -119,7 +134,7 @@
   top: 12%;
   width: 110px;
   height: 90px;
-  background: #8d8a82;
+  background: var(--house-a);
 }
 
 .house2 {
@@ -127,7 +142,7 @@
   top: 8%;
   width: 120px;
   height: 100px;
-  background: #7c7a74;
+  background: var(--house-b);
 }
 
 .house3 {
@@ -135,7 +150,7 @@
   bottom: 2%;
   width: 130px;
   height: 80px;
-  background: #948f84;
+  background: var(--house-c);
 }
 
 .roof {
@@ -144,9 +159,8 @@
   top: 46%;
   transform: translate(-50%, -50%) rotate(-12deg);
   padding: 12px;
-  background: #9c978b;
-  outline: 3px solid var(--sun);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  background: var(--roof);
+  outline: 3px solid var(--accent-bright);
 }
 
 .grid {
@@ -162,8 +176,8 @@
 }
 
 .panel {
-  background: var(--panel);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: var(--on-dark);
+  border: 1px solid var(--accent-bright);
 }
 
 .slot {
@@ -174,9 +188,9 @@
 .chipBottom {
   position: absolute;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   font-size: 14px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-float);
 }
 
 .chipTop {
@@ -189,15 +203,15 @@
 .chipBottom {
   right: 20px;
   bottom: 48px;
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .caption {
   position: absolute;
   left: 20px;
   bottom: 16px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--on-dark-muted);
   font-size: 12px;
 }
 
@@ -209,7 +223,7 @@
 }
 
 .sectionAlt {
-  background: var(--surface);
+  background: var(--surface-sunk);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -222,7 +236,7 @@
 
 .sectionTitle {
   margin: 0 0 32px;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -233,29 +247,22 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  gap: 32px;
 }
 
 .step {
-  padding: 24px;
-  border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  padding-top: 16px;
+  border-top: 2px solid var(--accent);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .stepNum {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--sun);
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .stepTitle,
@@ -269,8 +276,8 @@
 .featureBody {
   margin: 0;
   font-size: 15px;
-  line-height: 1.55;
-  color: #3a414b;
+  line-height: 1.6;
+  color: var(--text);
 }
 
 .features {
@@ -279,7 +286,7 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 28px 32px;
+  gap: 32px;
 }
 
 .feature {
@@ -288,13 +295,17 @@
   gap: 10px;
 }
 
+.feature > svg {
+  color: var(--accent);
+}
+
 .cta {
   max-width: 1200px;
   margin: 72px auto;
-  padding: 48px 32px;
-  border-radius: 20px;
-  background: var(--ink);
-  color: var(--surface);
+  padding: 40px 32px;
+  border-radius: var(--radius-xl);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -304,18 +315,9 @@
 
 .ctaTitle {
   margin: 0;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.02em;
-}
-
-.ctaPrimaryInverse {
-  background: var(--sun);
-  color: var(--ink);
-}
-
-.ctaPrimaryInverse:hover {
-  background: #ffc61a;
 }
 
 .footer {
@@ -323,6 +325,7 @@
   margin: 0 auto;
   padding: 0 24px 40px;
   font-size: 13px;
+  line-height: 1.5;
   color: var(--muted);
 }
 

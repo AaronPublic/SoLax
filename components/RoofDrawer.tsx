@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { approxAreaM2, type PolygonGeometry, type Position } from "@/lib/geo";
 import styles from "./RoofDrawer.module.css";
 
-const SUN = "#f5b700";
+const ACCENT = "#f97316";
 /** Smaller than any roof that fits a 2 m x 1 m panel plus setback; catches accidental clicks. */
 const MIN_AREA_M2 = 4;
 
@@ -59,9 +59,9 @@ export default function RoofDrawer({ map, initial, onDone, onCancel }: Props) {
         map,
         paths: path,
         editable: true,
-        strokeColor: SUN,
+        strokeColor: ACCENT,
         strokeWeight: 3,
-        fillColor: SUN,
+        fillColor: ACCENT,
         fillOpacity: 0.22,
         zIndex: 20,
       });
@@ -85,12 +85,12 @@ export default function RoofDrawer({ map, initial, onDone, onCancel }: Props) {
     };
 
     const startDrawing = () => {
-      line = new google.maps.Polyline({ map, editable: true, strokeColor: SUN, strokeWeight: 3, zIndex: 20 });
+      line = new google.maps.Polyline({ map, editable: true, strokeColor: ACCENT, strokeWeight: 3, zIndex: 20 });
       guide = new google.maps.Polyline({
         map,
         clickable: false,
         strokeOpacity: 0,
-        icons: [{ icon: { path: "M 0,-1 0,1", strokeColor: SUN, strokeOpacity: 1, scale: 2 }, offset: "0", repeat: "10px" }],
+        icons: [{ icon: { path: "M 0,-1 0,1", strokeColor: ACCENT, strokeOpacity: 1, scale: 2 }, offset: "0", repeat: "10px" }],
         zIndex: 19,
       });
       const path = line.getPath();

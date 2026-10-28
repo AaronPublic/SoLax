@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  border-radius: 12px;
-  border: 1.5px solid var(--ink);
-  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
 }
 
 .saved {
@@ -13,6 +13,7 @@
   align-items: center;
   gap: 10px;
   border-color: var(--ok);
+  background: var(--ok-bg);
   color: var(--ok);
 }
 
@@ -22,15 +23,16 @@
 
 .heading {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .text {
   margin: 0;
   font-size: 13px;
   line-height: 1.5;
-  color: #3a414b;
+  color: var(--text);
 }
 
 .row {
@@ -44,13 +46,14 @@
   min-width: 0;
   height: 44px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--line-strong);
-  font-size: 15px;
+  background: var(--surface);
+  font-size: 16px;
 }
 
 .input:focus {
-  outline: 2px solid var(--panel);
+  outline: 2px solid var(--focus);
   outline-offset: 1px;
   border-color: var(--ink);
 }
@@ -62,7 +65,7 @@
   justify-content: center;
   min-height: 44px;
   padding: 0 18px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -71,12 +74,12 @@
 
 .primary {
   border: 0;
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .primary:hover:not(:disabled) {
-  background: #2a313c;
+  background: var(--primary-hover);
 }
 
 .primary:disabled {
@@ -86,6 +89,7 @@
 
 .secondary {
   border: 1px solid var(--line-strong);
+  background: var(--surface);
   color: var(--ink);
 }
 

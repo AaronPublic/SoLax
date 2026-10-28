@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { MAX_TILES_PER_REQUEST, tilesForBbox } from "@/lib/tiles";
 import type { BuildingsResponse } from "@/lib/types";
 import type { PanelCollection, PolygonGeometry } from "@/lib/geo";
-import { MAP_BOUNDS, MAP_CENTER } from "@/lib/config";
+import { isWithinMapBounds, MAP_BOUNDS, MAP_CENTER } from "@/lib/config";
 import RoofDrawer from "@/components/RoofDrawer";
 import styles from "./SolarMap.module.css";
 
@@ -36,6 +36,8 @@ interface Props {
   draw: DrawRequest | null;
   onDrawDone: (geometry: PolygonGeometry) => void;
   onDrawCancel: () => void;
+  /** Small screens only: shown above the legend, in place of its colour key. */
+  overlay?: ReactNode;
 }
 
 export interface DrawRequest {
@@ -55,20 +57,38 @@ const FOCUS_ZOOM = 19;
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 let loaderConfigured = false;
 
-const SUN = "#f5b700";
-const PANEL_BLUE = "#1d4ed8";
+const ACCENT = "#f97316";
+const PANEL_FILL = "#ffffff";
 
-/** Buildings: invisible until hovered (yellow). Not clickable while the outline tool is open. */
-const buildingStyle = (clickable: boolean): google.maps.Data.StyleOptions => ({
-  fillColor: SUN,
-  fillOpacity: 0,
-  strokeColor: SUN,
-  strokeOpacity: 0,
+/**
+ * Buildings: invisible until hovered (orange). Touch screens can't hover, so there they're faintly
+ * outlined to show what can be tapped. Not clickable while the outline tool is open.
+ */
+const buildingStyle = (clickable: boolean, touch: boolean): google.maps.Data.StyleOptions => ({
+  fillColor: ACCENT,
+  fillOpacity: touch ? 0.08 : 0,
+  strokeColor: ACCENT,
+  strokeOpacity: touch ? 0.6 : 0,
   strokeWeight: 1,
   cursor: "pointer",
   clickable,
   zIndex: 1,
 });
+
+const NO_HOVER = "(hover: none)";
+const subscribeNoHover = (onChange: () => void) => {
+  const query = window.matchMedia(NO_HOVER);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+};
+
+/** True on touch-only devices. False during server rendering. */
+function useTouchScreen(): boolean {
+  return useSyncExternalStore(subscribeNoHover, () => window.matchMedia(NO_HOVER).matches, () => false);
+}
+
+/** How long a one-off message (e.g. a location error) stays in the status pill. */
+const NOTICE_MS = 6_000;
 
 type Status = { kind: "idle" | "loading" | "zoom" | "error"; text?: string };
 
@@ -76,12 +96,12 @@ function panelStyle(recommended: number): google.maps.Data.StylingFunction {
   return (f) => {
     const on = Number(f.getProperty("index")) < recommended;
     return on
-      ? { fillColor: PANEL_BLUE, fillOpacity: 0.9, strokeColor: "#ffffff", strokeOpacity: 0.85, strokeWeight: 0.6, clickable: false, zIndex: 3 }
+      ? { fillColor: PANEL_FILL, fillOpacity: 0.92, strokeColor: ACCENT, strokeOpacity: 0.9, strokeWeight: 0.6, clickable: false, zIndex: 3 }
       : { fillColor: "#ffffff", fillOpacity: 0.06, strokeColor: "#ffffff", strokeOpacity: 0.55, strokeWeight: 0.6, clickable: false, zIndex: 2 };
   };
 }
 
-export default function SolarMap({ panels, recommendedCount, roof, focus, onSelect, draw, onDrawDone, onDrawCancel }: Props) {
+export default function SolarMap({ panels, recommendedCount, roof, focus, onSelect, draw, onDrawDone, onDrawCancel, overlay }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const panelLayerRef = useRef<google.maps.Data | null>(null);
@@ -94,6 +114,9 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [buildingCount, setBuildingCount] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const touch = useTouchScreen();
   const mapError = API_KEY ? loadError : "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not set.";
 
   useEffect(() => {
@@ -149,7 +172,6 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
       });
       mapRef.current = map;
 
-      map.data.setStyle(buildingStyle(true));
       listeners.push(
         map.data.addListener("mouseover", (e: google.maps.Data.MouseEvent) => {
           map.data.overrideStyle(e.feature, { fillOpacity: 0.45, strokeOpacity: 0.9 });
@@ -174,7 +196,7 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
       // (e.g. a reopened plan).
       roofLayerRef.current = new Data({
         map,
-        style: { fillOpacity: 0, strokeColor: SUN, strokeOpacity: 1, strokeWeight: 3, clickable: false, zIndex: 4 },
+        style: { fillOpacity: 0, strokeColor: ACCENT, strokeOpacity: 1, strokeWeight: 3, clickable: false, zIndex: 4 },
       });
       setMapInstance(map);
 
@@ -276,15 +298,53 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !drawing) return;
-    map.data.setStyle(buildingStyle(false));
     panelLayerRef.current?.setMap(null);
     roofLayerRef.current?.setMap(null);
     return () => {
-      map.data.setStyle(buildingStyle(true));
       panelLayerRef.current?.setMap(map);
       roofLayerRef.current?.setMap(map);
     };
   }, [drawing, mapReady]);
+
+  useEffect(() => {
+    mapRef.current?.data.setStyle(buildingStyle(!drawing, touch));
+  }, [drawing, touch, mapReady]);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), NOTICE_MS);
+    return () => clearTimeout(timer);
+  }, [notice]);
+
+  const locate = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!("geolocation" in navigator)) {
+      setNotice("This browser can't share your location. Move the map to your home instead.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setLocating(false);
+        if (!isWithinMapBounds(coords.longitude, coords.latitude)) {
+          setNotice("You seem to be outside the Philippines. Move the map to your home instead.");
+          return;
+        }
+        map.setCenter({ lat: coords.latitude, lng: coords.longitude });
+        map.setZoom(FOCUS_ZOOM);
+      },
+      (err) => {
+        setLocating(false);
+        setNotice(
+          err.code === err.PERMISSION_DENIED
+            ? "Location access is off. Allow it in your browser, or move the map yourself."
+            : "Couldn't find your location. Move the map to your home instead.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+    );
+  };
 
   // Draw the fitted panels.
   useEffect(() => {
@@ -327,8 +387,9 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
     if (map) map.setZoom((map.getZoom() ?? 17) + delta);
   };
 
-  const pill =
-    status.kind === "idle"
+  const pill = notice
+    ? { text: notice, dot: styles.dotError }
+    : status.kind === "idle"
       ? buildingCount > 0
         ? { text: `${buildingCount.toLocaleString()} buildings loaded`, dot: styles.dotOk }
         : null
@@ -343,50 +404,72 @@ export default function SolarMap({ panels, recommendedCount, roof, focus, onSele
         <RoofDrawer key={draw.key} map={mapInstance} initial={draw.initial} onDone={onDrawDone} onCancel={onDrawCancel} />
       )}
 
-      {pill && (
+      {/* The outline tool's toolbar takes the top of the map while it's open. */}
+      {pill && !drawing && (
         <div className={styles.status} role="status">
           <span className={`${styles.dot} ${pill.dot}`} aria-hidden="true" />
           {pill.text}
         </div>
       )}
 
-      <div className={styles.zoom}>
-        <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1)}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
-        <button type="button" aria-label="Zoom out" onClick={() => zoomBy(-1)}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <path d="M5 12h14" />
-          </svg>
-        </button>
+      <div className={styles.controls}>
+        <div className={styles.group}>
+          <button
+            type="button"
+            aria-label="Go to my location"
+            title="Go to my location"
+            onClick={locate}
+            disabled={!mapReady || locating}
+            aria-busy={locating}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+          </button>
+        </div>
+        <div className={styles.group}>
+          <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+          <button type="button" aria-label="Zoom out" onClick={() => zoomBy(-1)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 12h14" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <div className={styles.legend}>
-        <div className={styles.legendItems}>
-          <span>
-            <span className={styles.swatchHover} aria-hidden="true" />
-            Hover to highlight
-          </span>
-          <span>
-            <span className={styles.swatchPanel} aria-hidden="true" />
-            Recommended panel
-          </span>
-          <span>
-            <span className={styles.swatchSlot} aria-hidden="true" />
-            Also fits
-          </span>
-        </div>
-        <div className={styles.attribution}>
-          Buildings ©{" "}
-          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-            OpenStreetMap contributors
-          </a>{" "}
-          via{" "}
-          <a href="https://openfreemap.org" target="_blank" rel="noreferrer">
-            OpenFreeMap
-          </a>
+      <div className={styles.bottom}>
+        {overlay && <div className={styles.overlay}>{overlay}</div>}
+        <div className={styles.legend}>
+          <div className={styles.legendItems}>
+            <span>
+              <span className={styles.swatchHover} aria-hidden="true" />
+              {touch ? "Tap a roof to select it" : "Hover to highlight"}
+            </span>
+            <span>
+              <span className={styles.swatchPanel} aria-hidden="true" />
+              Recommended panel
+            </span>
+            <span>
+              <span className={styles.swatchSlot} aria-hidden="true" />
+              Also fits
+            </span>
+          </div>
+          <div className={styles.attribution}>
+            Buildings ©{" "}
+            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+              OpenStreetMap contributors
+            </a>{" "}
+            via{" "}
+            <a href="https://openfreemap.org" target="_blank" rel="noreferrer">
+              OpenFreeMap
+            </a>
+          </div>
         </div>
       </div>
     </div>

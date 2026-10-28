@@ -1,4 +1,7 @@
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
@@ -6,7 +9,7 @@
 .inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: 12px 24px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -18,20 +21,24 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 18px;
+  gap: 8px 6px;
   font-size: 14px;
   font-weight: 600;
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
   color: var(--ink);
   text-decoration: none;
-  padding: 10px 0;
+  transition: background-color var(--dur-fast) var(--ease-out);
 }
 
 .link:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  background: rgba(14, 23, 38, 0.06);
 }
 
 .primary,
@@ -40,25 +47,30 @@
   align-items: center;
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 10px;
+  margin-left: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
 
 .primary {
-  background: var(--ink);
-  color: var(--surface);
-  border: 1px solid var(--ink);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 1px solid var(--primary);
 }
 
 .primary:hover {
-  background: #2a313c;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .secondary {
-  background: transparent;
+  background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--line-strong);
 }
@@ -69,6 +81,7 @@
 
 .email {
   max-width: 200px;
+  padding: 0 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -84,7 +97,7 @@
 
 @media (max-width: 600px) {
   .inner {
-    padding: 12px 16px;
+    padding: 10px 16px;
   }
 
   .email {
