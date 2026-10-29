@@ -33,7 +33,7 @@ export default function SolarPlanner() {
   const params = useSearchParams();
   const user = useUser();
 
-  const [kwhInput, setKwhInput] = useState("");
+  const [kwhInput, setKwhInput] = useState(() => params.get("kwh") ?? "");
   const [roof, setRoof] = useState<RoofSelection | null>(null);
   const [fit, setFit] = useState<CalculateSolarResponse | null>(null);
   const [focus, setFocus] = useState<MapFocus | null>(null);
@@ -267,6 +267,11 @@ export default function SolarPlanner() {
           )}
         </header>
 
+        <div className={styles.titleBlock}>
+          <h1 className={styles.screenTitle}>Roof array planner</h1>
+          <p className={styles.screenSub}>550 W monocrystalline · NREL PVWatts v8</p>
+        </div>
+
         <ol className={styles.steps} aria-label="Progress">
           {steps.map((s, i) => (
             <li key={s.label} className={styles.step} aria-current={!s.done && steps.slice(0, i).every((p) => p.done) ? "step" : undefined}>
@@ -276,7 +281,7 @@ export default function SolarPlanner() {
                     <path d="M5 12l5 5L20 7" />
                   </svg>
                 ) : (
-                  i + 1
+                  <span className={styles.stepDot} aria-hidden="true" />
                 )}
               </span>
               {s.label}

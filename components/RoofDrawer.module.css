@@ -3,15 +3,14 @@
   top: 20px;
   left: 20px;
   width: min(420px, calc(100% - 100px));
-  padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+  padding: 16px;
+  background: var(--bg);
   color: var(--ink);
-  box-shadow: var(--shadow-float);
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 2;
+  font-family: var(--font-display);
 }
 
 .instructions {
@@ -21,7 +20,7 @@
 }
 
 .meta {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -29,7 +28,6 @@
 .error {
   margin: 0;
   padding: 8px 10px;
-  border-radius: var(--radius-sm);
   background: var(--warn-bg);
   color: var(--warn-ink);
   font-size: 13px;
@@ -46,34 +44,32 @@
 .ghost {
   min-height: 40px;
   padding: 0 14px;
-  border-radius: var(--radius-sm);
+  border: 0;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .primary {
-  border: 0;
-  background: var(--primary);
-  color: var(--on-primary);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: var(--accent-hover);
 }
 
 .secondary {
-  border: 1px solid var(--line-strong);
   background: var(--surface);
+  color: var(--ink);
 }
 
 .secondary:hover:not(:disabled) {
-  border-color: var(--ink);
+  background: var(--surface-strong);
 }
 
 .ghost {
   margin-left: auto;
-  border: 0;
   background: transparent;
   color: var(--muted);
 }

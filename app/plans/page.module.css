@@ -1,39 +1,53 @@
 .main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 24px 72px;
+  padding: 40px var(--margin) 88px;
+  font-family: var(--font-display);
 }
 
 .head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 16px 24px;
+  margin-bottom: 36px;
 }
 
 .title {
   margin: 0;
-  font-size: clamp(30px, 3.4vw, 40px);
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-family: var(--font-text);
+  font-size: var(--step-body);
+  color: var(--muted);
 }
 
 .newPlan {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  color: var(--on-primary);
+  min-height: 46px;
+  padding: 0 22px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--step-small);
   font-weight: 600;
   text-decoration: none;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
 }
 
 .newPlan:hover {
-  background: var(--primary-hover);
+  background: var(--accent-hover);
+}
+
+.newPlan:active {
+  transform: scale(0.97);
 }
 
 .muted {
@@ -41,24 +55,62 @@
 }
 
 .empty {
-  padding: 48px 24px;
-  border-radius: var(--radius-lg);
-  border: 1.5px dashed var(--line-strong);
+  padding: 56px 24px;
   background: var(--surface);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .empty h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .empty p {
   margin: 0 0 8px;
+  font-family: var(--font-text);
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.ledger {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.kpiStrip {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.kpiCell {
+  padding: 18px 20px;
+  background: var(--surface);
+}
+
+.kpiCell dt {
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+.kpiCell dd {
+  margin: 6px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.kpiCell dd span {
+  font-size: var(--step-small);
+  font-weight: 500;
   color: var(--muted);
 }
 
@@ -67,20 +119,21 @@
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
 }
 
 .card {
-  padding: 20px;
-  border-radius: var(--radius-lg);
+  padding: 24px;
   background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-1);
-  transition: box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+  transition: background-color var(--t-hover) ease;
+}
+
+.card:hover {
+  background: var(--surface-strong);
 }
 
 .cardHead {
@@ -93,7 +146,7 @@
 .cardTitle {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
@@ -107,22 +160,21 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 
 .stats > div {
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-sunk);
+  padding: 12px 14px;
+  background: var(--bg);
 }
 
 .stats dt {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
 .stats dd {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -161,26 +213,30 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line-strong);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--step-small);
   font-weight: 600;
   text-decoration: none;
-  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: background-color var(--t-hover) ease;
 }
 
 .open:hover {
-  border-color: var(--accent);
-  color: var(--primary);
+  background: var(--accent);
 }
 
-.card:hover {
-  border-color: var(--line-strong);
-  box-shadow: var(--shadow-2);
+@media (max-width: 900px) {
+  .kpiStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
   .main {
-    padding: 28px 16px 56px;
+    padding: 28px var(--margin) 56px;
+  }
+
+  .kpiStrip {
+    grid-template-columns: 1fr;
   }
 }

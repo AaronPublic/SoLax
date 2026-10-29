@@ -1,40 +1,39 @@
 .card {
   width: 100%;
   max-width: 420px;
-  padding: 32px;
-  border-radius: var(--radius-xl);
+  padding: 36px;
   background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-2);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
+  font-family: var(--font-display);
 }
 
 .title {
   margin: 0;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.025em;
+  color: var(--ink);
 }
 
 .text {
   margin: 6px 0 0;
-  color: var(--text);
-  font-size: 15px;
+  font-family: var(--font-text);
+  color: var(--ink);
+  font-size: 16px;
   line-height: 1.5;
 }
 
 .small {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
 .error {
   margin: 0;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   border-left: 3px solid var(--warn);
   background: var(--warn-bg);
   color: var(--warn-ink);
@@ -48,16 +47,16 @@
 }
 
 .field label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
+  color: var(--ink);
 }
 
 .field input {
   height: 48px;
   padding: 0 14px;
-  border-radius: var(--radius-md);
   border: 1.5px solid var(--line-strong);
-  background: var(--surface);
+  background: var(--bg);
   font-size: 16px;
 }
 
@@ -68,23 +67,29 @@
 }
 
 .hint {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
 .submit {
   min-height: 50px;
   border: 0;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  color: var(--on-primary);
+  background: var(--accent);
+  color: var(--accent-ink);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
 }
 
 .submit:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: var(--accent-hover);
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .submit:disabled {
@@ -101,14 +106,22 @@
 
 .switch a {
   font-weight: 600;
+  color: var(--ink);
 }
 
 .linkButton {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--link);
+  color: var(--accent);
   font-size: inherit;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 24px 20px;
+  }
 }

@@ -1,11 +1,17 @@
 .wrap {
   position: absolute;
   inset: 0;
+  font-family: var(--font-display);
 }
 
 .map {
   position: absolute;
   inset: 0;
+}
+
+.map :global(.gm-style-cc),
+.map :global(.gm-style-cc) * {
+  font-size: 11px !important;
 }
 
 .status {
@@ -18,7 +24,6 @@
   min-height: 36px;
   max-width: calc(100% - 100px);
   padding: 8px 14px;
-  border-radius: var(--radius-pill);
   background: var(--scrim);
   color: var(--on-dark);
   font-size: 13px;
@@ -62,30 +67,26 @@
 .group {
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow-float);
+  gap: 2px;
+  padding: 2px;
+  background: var(--scrim);
 }
 
 .group button {
   width: 44px;
   height: 44px;
   border: 0;
-  background: var(--surface);
+  background: #ffffff;
   color: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-
-.group button + button {
-  border-top: 1px solid var(--line);
+  transition: background-color var(--t-hover) ease;
 }
 
 .group button:hover:not(:disabled) {
-  background: var(--ground);
+  background: var(--surface);
 }
 
 .group button:disabled {
@@ -93,7 +94,6 @@
   cursor: progress;
 }
 
-/* Summary card (if any) stacked above the legend. */
 .bottom {
   position: absolute;
   left: 20px;
@@ -105,7 +105,6 @@
   gap: 8px;
 }
 
-/* Small screens only: on wide ones the sidebar beside the map already shows the same thing. */
 .overlay {
   display: none;
   width: 100%;
@@ -116,10 +115,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
   background: var(--scrim);
   color: var(--on-dark);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .legendItems {
@@ -143,7 +141,7 @@
 
 .swatchHover {
   height: 10px;
-  background: rgba(249, 115, 22, 0.55);
+  background: rgba(20, 150, 165, 0.55);
   outline: 1.5px solid var(--accent-bright);
 }
 
@@ -155,12 +153,12 @@
 
 .swatchSlot {
   height: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  outline: 1px solid rgba(255, 255, 255, 0.75);
 }
 
 .attribution {
   color: var(--on-dark-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .attribution a {
@@ -183,9 +181,6 @@
   .status {
     top: 12px;
     right: 12px;
-  }
-
-  .status {
     max-width: calc(100% - 24px);
   }
 
@@ -204,7 +199,6 @@
     display: block;
   }
 
-  /* The summary card replaces the colour key; attribution stays. */
   .bottom:has(.overlay) .legendItems {
     display: none;
   }

@@ -12,7 +12,6 @@ interface Props {
   targetKwh: number | null;
   loading: boolean;
   error: string | null;
-  /** Runs the failed calculation again; omitted when there's nothing to retry. */
   onRetry?: () => void;
 }
 
@@ -50,6 +49,8 @@ export default function ResultsPanel({ fit, sizing, targetKwh, loading, error, o
   const meets = coverage >= 100;
   const peak = Math.max(...sizing.monthlyKwh, targetKwh, 1);
   const targetLeft = `${(targetKwh / peak) * 100}%`;
+  const estMonthly = Math.round(sizing.estMonthlyKwh);
+  const netDelta = estMonthly - Math.round(targetKwh);
 
   return (
     <div className={styles.results}>
@@ -58,6 +59,40 @@ export default function ResultsPanel({ fit, sizing, targetKwh, loading, error, o
           The roof fits {fit.maxPanels} panels; about {sizing.neededPanels} would be needed to cover your full usage.
         </p>
       )}
+
+      {/* Signature element: Energy & Bill Flow Summary */}
+      <section className={styles.powerFlow} aria-label="Energy balance summary">
+        <div className={styles.flowNode}>
+          <span className={styles.flowLabel}>Sun array</span>
+          <strong className={styles.flowValueAccent}>
+            {fmt(sizing.systemCapacityKw, 2)} <span>kWp</span>
+          </strong>
+        </div>
+        <span className={styles.flowArrow} aria-hidden="true">
+          →
+        </span>
+        <div className={styles.flowNode}>
+          <span className={styles.flowLabel}>Solar output</span>
+          <strong className={styles.flowValueAccent}>
+            {fmt(estMonthly)} <span>kWh</span>
+          </strong>
+        </div>
+        <span className={styles.flowArrow} aria-hidden="true">
+          →
+        </span>
+        <div className={styles.flowNode}>
+          <span className={styles.flowLabel}>Home bill</span>
+          <strong className={styles.flowValue}>
+            {fmt(targetKwh)} <span>kWh</span>
+          </strong>
+        </div>
+        <div className={styles.flowNode}>
+          <span className={styles.flowLabel}>Balance</span>
+          <strong className={netDelta >= 0 ? styles.ok : styles.warn}>
+            {netDelta >= 0 ? `+${fmt(netDelta)}` : fmt(netDelta)} <span>kWh</span>
+          </strong>
+        </div>
+      </section>
 
       <dl className={styles.stats}>
         <Stat label="Panels" value={String(sizing.recommendedPanels)} sub={`of ${fit.maxPanels} that fit`} />
@@ -68,7 +103,7 @@ export default function ResultsPanel({ fit, sizing, targetKwh, loading, error, o
 
       <section className={styles.chart}>
         <div className={styles.chartHead}>
-          <h2 className={styles.heading}>Monthly production</h2>
+          <h2 className={styles.heading}>Monthly production (kWh)</h2>
           <span className={styles.legend}>
             <span className={styles.legendMark} aria-hidden="true" />
             your usage

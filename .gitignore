@@ -43,3 +43,8 @@ next-env.d.ts
 
 # prisma client
 /generated/
+
+# taste-skill inspection screenshots & raw download cache
+/.taste-skill/
+/assets/*.jpg
+/assets/*.webm

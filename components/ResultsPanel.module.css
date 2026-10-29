@@ -1,7 +1,8 @@
 .results {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+  font-family: var(--font-display);
   animation: rise var(--dur) var(--ease-out);
 }
 
@@ -9,10 +10,9 @@
 .warning {
   margin: 0;
   padding: 12px 14px;
-  border-radius: var(--radius-md);
   background: var(--warn-bg);
   color: var(--warn-ink);
-  font-size: 14px;
+  font-size: var(--step-small);
   line-height: 1.45;
 }
 
@@ -33,25 +33,20 @@
 .retry {
   min-height: 36px;
   padding: 0 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid currentColor;
-  background: transparent;
-  font-size: 13px;
+  border: 0;
+  background: var(--warn-ink);
+  color: var(--bg);
+  font-size: var(--step-small);
   font-weight: 600;
   cursor: pointer;
-}
-
-.retry:hover {
-  background: rgba(153, 27, 27, 0.06);
 }
 
 .notice {
   margin: 0;
   padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  background: var(--surface-sunk);
-  color: var(--text);
-  font-size: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--step-small);
   line-height: 1.5;
 }
 
@@ -61,7 +56,7 @@
   align-items: center;
   gap: 10px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--step-small);
 }
 
 .spinner {
@@ -80,34 +75,68 @@
   }
 }
 
-/* Stat cards */
-.stats {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+/* Signature element: Power & Yield Flow Summary */
+.powerFlow {
+  padding: 14px 16px;
+  background: var(--surface);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.stat {
-  padding: 14px 16px;
+.flowNode {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-/* Hairline grid between the four cells. */
-.stat:nth-child(odd) {
-  border-right: 1px solid var(--line);
+.flowLabel {
+  font-size: var(--step-small);
+  color: var(--muted);
 }
 
-.stat:nth-child(-n + 2) {
-  border-bottom: 1px solid var(--line);
+.flowValue,
+.flowValueAccent {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.flowValueAccent {
+  color: var(--accent);
+}
+
+.flowNode strong span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.flowArrow {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Stat cards — separated by tone gap, no hairline borders */
+.stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.stat {
+  padding: 14px 16px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .stat dt {
-  font-size: 13px;
+  font-size: var(--step-small);
   color: var(--muted);
 }
 
@@ -117,26 +146,25 @@
 
 .statValue {
   font-size: 26px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
-/* The lead figure: how many panels. */
 .stat:first-child .statValue {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .statUnit {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--step-small);
+  font-weight: 600;
   letter-spacing: 0;
   color: var(--muted);
 }
 
 .statSub {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -165,14 +193,14 @@
 .heading {
   margin: 0;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .legend {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -193,10 +221,10 @@
 
 .bars li {
   display: grid;
-  grid-template-columns: 30px 1fr 44px;
+  grid-template-columns: 32px 1fr 48px;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .month {
@@ -206,8 +234,7 @@
 .track {
   position: relative;
   height: 10px;
-  border-radius: 2px;
-  background: var(--track);
+  background: var(--surface);
 }
 
 .track::after {
@@ -220,11 +247,9 @@
   background: var(--ink);
 }
 
-/* Full width, scaled to the month's share; grows in month by month on first show. */
 .bar {
   position: absolute;
   inset: 0;
-  border-radius: 2px;
   background: var(--accent);
   transform-origin: left;
   transition: transform var(--dur) var(--ease-out);
@@ -240,16 +265,17 @@
 
 .value {
   text-align: right;
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 /* Details */
 .details {
   margin: 0;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  padding: 14px 16px;
+  background: var(--surface);
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 8px 16px;
@@ -262,5 +288,7 @@
 
 .details dd {
   margin: 0;
+  text-align: right;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }

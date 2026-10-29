@@ -1,15 +1,10 @@
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
+  width: 100%;
+  background: var(--bg);
 }
 
 .inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 12px 24px;
+  padding: 20px var(--margin);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -21,67 +16,79 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 6px;
-  font-size: 14px;
+  gap: 8px 24px;
+  font-family: var(--font-display);
+  font-size: var(--step-small);
   font-weight: 600;
 }
 
 .link {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
+  min-height: 44px;
+  padding: 0 4px;
   color: var(--ink);
-  text-decoration: none;
-  transition: background-color var(--dur-fast) var(--ease-out);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: 0.08em;
+  transition:
+    text-decoration-color var(--t-hover) ease,
+    color var(--t-hover) ease;
 }
 
 .link:hover {
-  background: rgba(14, 23, 38, 0.06);
+  text-decoration-color: var(--ink);
 }
 
 .primary,
 .secondary {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 16px;
-  margin-left: 6px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-small);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out);
+    background-color var(--t-hover) ease,
+    color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
+}
+
+.primary:active,
+.secondary:active {
+  transform: scale(0.97);
 }
 
 .primary {
-  background: var(--primary);
-  color: var(--on-primary);
-  border: 1px solid var(--primary);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: var(--accent-hover);
 }
 
 .secondary {
   background: var(--surface);
   color: var(--ink);
-  border: 1px solid var(--line-strong);
 }
 
 .secondary:hover {
-  border-color: var(--ink);
+  background: var(--surface-strong);
+}
+
+.signoutForm {
+  margin: 0;
 }
 
 .email {
-  max-width: 200px;
-  padding: 0 6px;
+  max-width: 190px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -91,13 +98,29 @@
 
 .placeholder {
   display: inline-block;
-  width: 180px;
-  height: 40px;
+  width: 160px;
+  height: 44px;
 }
 
 @media (max-width: 600px) {
   .inner {
-    padding: 10px 16px;
+    padding: 12px var(--margin);
+    gap: 8px 10px;
+  }
+
+  .nav {
+    gap: 6px 10px;
+  }
+
+  .link {
+    min-height: 38px;
+    padding: 0 2px;
+  }
+
+  .primary,
+  .secondary {
+    min-height: 38px;
+    padding: 0 10px;
   }
 
   .email {

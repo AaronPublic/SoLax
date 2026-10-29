@@ -1,25 +1,93 @@
 .page {
   min-height: 100dvh;
-  background: var(--surface-sunk);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  background: var(--bg);
+}
+
+.leftPane {
+  grid-column: 1 / 6;
+  padding: 28px var(--margin) 36px;
+  background: var(--surface);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
 }
 
 .header {
-  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.brief {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 44ch;
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-size: var(--step-lead);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.specList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: var(--font-display);
+}
+
+.specList dt {
+  font-size: var(--step-small);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.specList dd {
+  margin: 4px 0 0;
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+.leftFooter {
+  font-family: var(--font-display);
+  font-size: var(--step-small);
+}
+
+.backLink {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
 }
 
 .main {
-  flex: 1;
+  grid-column: 6 / 13;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 32px 16px 64px;
+  padding: 40px var(--margin);
+  background: var(--bg);
 }
 
-@media (min-height: 760px) {
+@media (max-width: 900px) {
+  .leftPane,
   .main {
-    align-items: center;
-    padding-bottom: 120px;
+    grid-column: 1 / -1;
+  }
+
+  .leftPane {
+    padding: 20px var(--margin) 28px;
+    gap: 24px;
   }
 }

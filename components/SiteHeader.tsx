@@ -9,7 +9,7 @@ export default function SiteHeader() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Logo />
-        <nav className={styles.nav} aria-label="Account">
+        <nav className={styles.nav} aria-label="Main">
           <Link href="/plan" className={styles.link}>
             Planner
           </Link>
@@ -46,7 +46,7 @@ async function AccountLinks() {
       <span className={styles.email} title={user.email ?? undefined}>
         {user.email}
       </span>
-      <form action="/auth/signout" method="post">
+      <form action="/auth/signout" method="post" className={styles.signoutForm}>
         <button type="submit" className={styles.secondary}>
           Sign out
         </button>
